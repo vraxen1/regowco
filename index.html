@@ -2,627 +2,314 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Code Sprint Arena</title>
+  <title>ReGlow — Creative Ecosystem</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #050816;
-      --panel: #0f172a;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.15);
+      --bg: #050510;
+      --panel: rgba(15, 20, 35, 0.55);
+      --accent: #6ee7ff;
+      --accent2: #8b5cf6;
       --text: #e5e7eb;
       --muted: #9ca3af;
-      --danger: #f97373;
-      --success: #4ade80;
-      --font: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --radius: 18px;
+      --glow: 0 0 25px rgba(110, 231, 255, 0.4);
+      --font: 'Inter', sans-serif;
     }
 
     * {
       box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
     body {
-      margin: 0;
-      min-height: 100vh;
+      background: radial-gradient(circle at top, #0f172a 0, #050510 60%, #000 100%);
+      color: var(--text);
       font-family: var(--font);
-      background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
-      color: var(--text);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+      overflow-x: hidden;
     }
 
-    .app {
-      width: 100%;
-      max-width: 960px;
-      background: linear-gradient(135deg, #020617, #0b1120);
-      border-radius: 18px;
-      border: 1px solid rgba(148, 163, 184, 0.25);
-      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.9);
-      padding: 20px;
-      display: grid;
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-      gap: 18px;
-    }
-
-    .top-bar {
-      grid-column: 1 / -1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .brand {
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .clock {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      border-radius: 999px;
-      background: var(--accent-soft);
-      border: 1px solid rgba(56, 189, 248, 0.5);
-      font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.9rem;
-    }
-
-    .clock-label {
-      text-transform: uppercase;
-      font-size: 0.7rem;
-      color: var(--muted);
-    }
-
-    .clock-time {
-      font-weight: 600;
-      letter-spacing: 0.12em;
-    }
-
-    .stats {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .pill {
-      padding: 4px 10px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-    }
-
-    .panel {
-      background: var(--panel);
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .panel::before {
-      content: "";
-      position: absolute;
+    /* Floating particles */
+    .particles {
+      position: fixed;
       inset: 0;
-      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.12), transparent 55%);
-      opacity: 0.7;
       pointer-events: none;
+      z-index: 0;
     }
 
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .panel-title {
-      font-size: 0.9rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-    }
-
-    .panel-tag {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: var(--muted);
-    }
-
-    #promptText {
-      position: relative;
-      z-index: 1;
-      font-size: 0.95rem;
-      line-height: 1.5;
-    }
-
-    .difficulty {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .editor-wrapper {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    #editor {
-      width: 100%;
-      min-height: 220px;
-      border-radius: 10px;
-      border: 1px solid rgba(30, 64, 175, 0.7);
-      background: #020617;
-      color: var(--text);
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.9rem;
-      padding: 10px;
-      resize: vertical;
-      outline: none;
-    }
-
-    #editor:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.6);
-    }
-
-    .editor-hint {
-      font-size: 0.75rem;
-      color: var(--muted);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      margin-top: 4px;
-    }
-
-    button {
-      border: none;
-      border-radius: 999px;
-      padding: 8px 14px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: transform 0.08s ease, box-shadow 0.12s ease, background 0.12s ease;
-    }
-
-    button:active {
-      transform: translateY(1px);
-      box-shadow: none;
-    }
-
-    .btn-primary {
+    .particle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
       background: var(--accent);
-      color: #0b1120;
-      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.45);
+      border-radius: 50%;
+      opacity: 0.6;
+      animation: float 12s infinite linear;
+      filter: blur(2px);
     }
 
-    .btn-primary:hover {
-      background: #0ea5e9;
+    @keyframes float {
+      from { transform: translateY(0); }
+      to { transform: translateY(-120vh); }
     }
 
-    .btn-secondary {
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--muted);
-      border: 1px solid rgba(148, 163, 184, 0.6);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(15, 23, 42, 1);
-    }
-
-    #result {
-      position: relative;
-      z-index: 1;
-      margin-top: 8px;
-      font-size: 0.85rem;
-    }
-
-    .result-line {
+    header {
+      padding: 20px 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 6px 10px;
-      border-radius: 8px;
-      margin-bottom: 4px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
+      backdrop-filter: blur(12px);
+      background: rgba(10, 10, 20, 0.4);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
-    .result-line.pass {
-      border-color: rgba(74, 222, 128, 0.7);
-      background: rgba(22, 163, 74, 0.12);
+    .logo {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: var(--glow);
+      letter-spacing: 0.05em;
     }
 
-    .result-line.fail {
-      border-color: rgba(248, 113, 113, 0.7);
-      background: rgba(220, 38, 38, 0.12);
-    }
-
-    .result-label {
-      font-size: 0.8rem;
+    nav a {
+      margin-left: 20px;
       color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: 0.2s;
     }
 
-    .result-value {
-      font-size: 0.85rem;
+    nav a:hover {
+      color: var(--accent);
+      text-shadow: var(--glow);
     }
 
-    .result-value.pass {
-      color: var(--success);
-    }
-
-    .result-value.fail {
-      color: var(--danger);
-    }
-
-    .side-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .side-section {
-      background: var(--panel);
-      border-radius: 14px;
-      border: 1px solid rgba(148, 163, 184, 0.35);
-      padding: 12px;
+    /* Hero */
+    .hero {
+      padding: 140px 40px;
+      text-align: center;
       position: relative;
-      overflow: hidden;
+      z-index: 2;
     }
 
-    .side-section::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.12), transparent 55%);
-      opacity: 0.7;
-      pointer-events: none;
+    .hero h1 {
+      font-size: 3.4rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-shadow: var(--glow);
+      margin-bottom: 10px;
+      animation: fadeIn 1.2s ease;
     }
 
-    .side-title {
-      font-size: 0.8rem;
+    .hero p {
+      font-size: 1.2rem;
+      color: var(--muted);
+      max-width: 650px;
+      margin: auto;
+      animation: fadeIn 1.6s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Sections */
+    .section {
+      padding: 60px 40px;
+      max-width: 1100px;
+      margin: auto;
+      position: relative;
+      z-index: 2;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
       font-weight: 600;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 6px;
-      position: relative;
-      z-index: 1;
+      margin-bottom: 20px;
+      color: var(--accent2);
+      text-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
     }
 
-    .side-body {
+    /* Glass cards */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--panel);
+      backdrop-filter: blur(18px);
+      padding: 20px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.4);
+      transition: 0.25s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 0 35px rgba(110, 231, 255, 0.25);
+      border-color: rgba(110, 231, 255, 0.4);
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 1.2rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.4;
+    }
+
+    /* Footer */
+    footer {
+      padding: 40px;
+      text-align: center;
+      color: var(--muted);
       font-size: 0.8rem;
-      color: var(--muted);
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 40px;
       position: relative;
-      z-index: 1;
-    }
-
-    .chip-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    .chip {
-      font-size: 0.75rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(148, 163, 184, 0.4);
-      color: var(--muted);
-    }
-
-    @media (max-width: 768px) {
-      .app {
-        grid-template-columns: minmax(0, 1fr);
-      }
-      .top-bar {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-      }
+      z-index: 2;
     }
   </style>
 </head>
 <body>
-  <div class="app">
-    <div class="top-bar">
-      <div>
-        <div class="brand">Sequence Sprint</div>
-      </div>
-      <div class="clock" id="clock">
-        <span class="clock-label">Time left</span>
-        <span class="clock-time" id="clockTime">03:00</span>
-      </div>
-      <div class="stats">
-        <div class="pill" id="scorePill">Score: <span id="score">0</span></div>
-        <div class="pill">Best: <span id="bestScore">0</span></div>
-      </div>
+
+<!-- Floating particles -->
+<div class="particles"></div>
+
+<script>
+  // Generate floating neon particles
+  const container = document.querySelector('.particles');
+  for (let i = 0; i < 40; i++) {
+    const p = document.createElement('div');
+    p.classList.add('particle');
+    p.style.left = Math.random() * 100 + 'vw';
+    p.style.top = Math.random() * 100 + 'vh';
+    p.style.animationDuration = 8 + Math.random() * 10 + 's';
+    container.appendChild(p);
+  }
+</script>
+
+<header>
+  <div class="logo">ReGlow</div>
+  <nav>
+    <a href="#comfort">Comfort</a>
+    <a href="#freshfruit">FreshFruit</a>
+    <a href="#urbanmove">UrbanMove</a>
+    <a href="#route">Route Ω</a>
+    <a href="#vacation">Vacation</a>
+    <a href="#egp">EGP</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>ReGlow Ecosystem</h1>
+  <p>A modern universe built by Kārlis — blending comfort, drinks, travel, design, and imagination into one glowing brand.</p>
+</section>
+
+<!-- Sections -->
+<section class="section" id="comfort">
+  <h2 class="section-title">ReGlow Comfort</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Comfort Packs</h3>
+      <p>Premium candles, cozy packs, and accessories designed with a dark‑neon aesthetic.</p>
     </div>
-
-    <!-- Left: prompt + editor -->
-    <div class="panel">
-      <div class="panel-header">
-        <div class="panel-title">Challenge</div>
-        <div class="panel-tag" id="challengeTag">Easy • JS</div>
-      </div>
-      <div id="promptText"></div>
-      <div class="difficulty" id="difficultyText"></div>
-
-      <div class="editor-wrapper">
-        <textarea id="editor"></textarea>
-        <div class="editor-hint">
-          <span>Write a function named <code id="fnNameHint"></code> that solves the task.</span>
-          <span>Tests: <span id="testCount">0</span></span>
-        </div>
-        <div class="btn-row">
-          <button class="btn-primary" id="runBtn">Run tests</button>
-          <button class="btn-secondary" id="nextBtn">Next challenge</button>
-        </div>
-      </div>
-
-      <div id="result"></div>
-    </div>
-
-    <!-- Right: info / log -->
-    <div class="side-panel">
-      <div class="side-section">
-        <div class="side-title">Session</div>
-        <div class="side-body">
-          <div>Beat the clock by solving as many challenges as you can before time hits zero.</div>
-          <div class="chip-row">
-            <div class="chip">JS only</div>
-            <div class="chip">Pure browser</div>
-            <div class="chip">No backend</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="side-section">
-        <div class="side-title">Activity</div>
-        <div class="side-body" id="activityLog">
-          Ready when you are. Hit <strong>Run tests</strong> to check your solution.
-        </div>
-      </div>
+    <div class="card">
+      <h3>Brand Style</h3>
+      <p>Glassmorphism, neon accents, and modern minimalism define the ReGlow Comfort identity.</p>
     </div>
   </div>
+</section>
 
-  <script>
-    // --- Challenge data ------------------------------------------------------
-    const challenges = [
-      {
-        id: 1,
-        title: "Reverse a string",
-        difficulty: "Easy",
-        tag: "Strings • JS",
-        fnName: "reverseString",
-        prompt:
-          "Given a string, return a new string with the characters in reverse order.\n\nExample:\nInput: 'hello'\nOutput: 'olleh'",
-        tests: [
-          { input: ["hello"], expected: "olleh" },
-          { input: ["racecar"], expected: "racecar" },
-          { input: [""], expected: "" },
-          { input: ["abc"], expected: "cba" }
-        ]
-      },
-      {
-        id: 2,
-        title: "Sum an array",
-        difficulty: "Easy",
-        tag: "Arrays • JS",
-        fnName: "sumArray",
-        prompt:
-          "Given an array of numbers, return the sum of all elements.\n\nExample:\nInput: [1, 2, 3]\nOutput: 6",
-        tests: [
-          { input: [[1, 2, 3]], expected: 6 },
-          { input: [[0, 0, 0]], expected: 0 },
-          { input: [[5]], expected: 5 },
-          { input: [[-1, 1, -2, 2]], expected: 0 }
-        ]
-      },
-      {
-        id: 3,
-        title: "Is palindrome",
-        difficulty: "Medium",
-        tag: "Logic • JS",
-        fnName: "isPalindrome",
-        prompt:
-          "Return true if the given string is a palindrome (reads the same forwards and backwards), otherwise false.\n\nIgnore case.\n\nExample:\nInput: 'Level'\nOutput: true",
-        tests: [
-          { input: ["Level"], expected: true },
-          { input: ["racecar"], expected: true },
-          { input: ["hello"], expected: false },
-          { input: ["Madam"], expected: true }
-        ]
-      }
-    ];
+<section class="section" id="freshfruit">
+  <h2 class="section-title">FreshFruit</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Flavored Water</h3>
+      <p>Lemon Classic, Berry Mix, Mint Lime — clean PET bottles inspired by Mangaļi style.</p>
+    </div>
+    <div class="card">
+      <h3>Brand Vision</h3>
+      <p>Refreshing, simple, and modern hydration with a premium feel.</p>
+    </div>
+  </div>
+</section>
 
-    // --- State ---------------------------------------------------------------
-    let currentIndex = 0;
-    let score = 0;
-    let bestScore = 0;
-    let time = 180; // seconds
-    let timerId = null;
-    let sessionEnded = false;
+<section class="section" id="urbanmove">
+  <h2 class="section-title">UrbanMove</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Transport Concepts</h3>
+      <p>Futuristic mobility ideas and fictional transport systems.</p>
+    </div>
+    <div class="card">
+      <h3>Visual Identity</h3>
+      <p>Clean lines, neon accents, and sleek urban design.</p>
+    </div>
+  </div>
+</section>
 
-    // --- DOM refs ------------------------------------------------------------
-    const clockTimeEl = document.getElementById("clockTime");
-    const scoreEl = document.getElementById("score");
-    const bestScoreEl = document.getElementById("bestScore");
-    const promptTextEl = document.getElementById("promptText");
-    const difficultyTextEl = document.getElementById("difficultyText");
-    const challengeTagEl = document.getElementById("challengeTag");
-    const fnNameHintEl = document.getElementById("fnNameHint");
-    const testCountEl = document.getElementById("testCount");
-    const editorEl = document.getElementById("editor");
-    const resultEl = document.getElementById("result");
-    const activityLogEl = document.getElementById("activityLog");
-    const runBtn = document.getElementById("runBtn");
-    const nextBtn = document.getElementById("nextBtn");
+<section class="section" id="route">
+  <h2 class="section-title">Route Ω Nowhere</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Scenic Routes</h3>
+      <p>Atmospheric train journeys and immersive landscapes.</p>
+    </div>
+    <div class="card">
+      <h3>Worldbuilding</h3>
+      <p>A fictional universe built through imagination and design.</p>
+    </div>
+  </div>
+</section>
 
-    // --- Clock ---------------------------------------------------------------
-    function formatTime(seconds) {
-      const m = String(Math.floor(seconds / 60)).padStart(2, "0");
-      const s = String(seconds % 60).padStart(2, "0");
-      return m + ":" + s;
-    }
+<section class="section" id="vacation">
+  <h2 class="section-title">ReGlowVacation</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Travel Inspiration</h3>
+      <p>Trapani, Italy — your annual escape and creative recharge.</p>
+    </div>
+    <div class="card">
+      <h3>Future Plans</h3>
+      <p>Expanding into curated travel guides and experiences.</p>
+    </div>
+  </div>
+</section>
 
-    function startClock() {
-      if (timerId) return;
-      clockTimeEl.textContent = formatTime(time);
-      timerId = setInterval(() => {
-        if (time <= 0) {
-          clearInterval(timerId);
-          timerId = null;
-          sessionEnded = true;
-          clockTimeEl.textContent = "00:00";
-          logActivity("Time's up. Session ended.");
-          runBtn.disabled = true;
-          nextBtn.disabled = true;
-          return;
-        }
-        time--;
-        clockTimeEl.textContent = formatTime(time);
-      }, 1000);
-    }
+<section class="section" id="egp">
+  <h2 class="section-title">EGP — Entertainment & Games</h2>
+  <div class="grid">
+    <div class="card">
+      <h3>Game Studio Vision</h3>
+      <p>Modding, scripting, and worldbuilding — the foundation of your future game studio.</p>
+    </div>
+    <div class="card">
+      <h3>Creative Direction</h3>
+      <p>Bold ideas, modern visuals, and immersive experiences.</p>
+    </div>
+  </div>
+</section>
 
-    // --- UI helpers ----------------------------------------------------------
-    function logActivity(message) {
-      const now = new Date();
-      const timeStr = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-      activityLogEl.innerHTML =
-        "<div><strong>" +
-        timeStr +
-        "</strong> — " +
-        message +
-        "</div>";
-    }
+<footer>
+  ReGlow Ecosystem © 2026 — Built by Kārlis
+</footer>
 
-    function renderChallenge(index) {
-      const c = challenges[index];
-      promptTextEl.textContent = c.title + "\n\n" + c.prompt;
-      difficultyTextEl.textContent = c.difficulty;
-      challengeTagEl.textContent = c.tag;
-      fnNameHintEl.textContent = c.fnName + "()";
-      testCountEl.textContent = c.tests.length;
-      editorEl.value =
-        "function " +
-        c.fnName +
-        "(" +
-        (c.fnName === "sumArray" ? "arr" : "str") +
-        ") {\n  // Your code here\n}\n";
-      resultEl.innerHTML = "";
-      logActivity("Loaded challenge: " + c.title);
-    }
-
-    function runTests() {
-      if (sessionEnded) return;
-      const c = challenges[currentIndex];
-      const userCode = editorEl.value;
-
-      let fn;
-      try {
-        // eslint-disable-next-line no-new-func
-        const wrapped = new Function(userCode + "\nreturn " + c.fnName + ";");
-        fn = wrapped();
-      } catch (e) {
-        resultEl.innerHTML =
-          '<div class="result-line fail">' +
-          '<span class="result-label">Error</span>' +
-          '<span class="result-value fail">' +
-          e.message +
-          "</span>" +
-          "</div>";
-        logActivity("Code error: " + e.message);
-        return;
-      }
-
-      let passed = 0;
-      let outputHtml = "";
-      c.tests.forEach((t, idx) => {
-        let actual;
-        let ok = false;
-        try {
-          actual = fn.apply(null, t.input);
-          ok = JSON.stringify(actual) === JSON.stringify(t.expected);
-        } catch (e) {
-          actual = "Error: " + e.message;
-          ok = false;
-        }
-
-        if (ok) passed++;
-
-        outputHtml +=
-          '<div class="result-line ' +
-          (ok ? "pass" : "fail") +
-          '">' +
-          '<span class="result-label">Test ' +
-          (idx + 1) +
-          "</span>" +
-          '<span class="result-value ' +
-          (ok ? "pass" : "fail") +
-          '">' +
-          (ok ? "OK" : "Expected " + JSON.stringify(t.expected) + ", got " + JSON.stringify(actual)) +
-          "</span>" +
-          "</div>";
-      });
-
-      resultEl.innerHTML = outputHtml;
-
-      if (passed === c.tests.length) {
-        score++;
-        scoreEl.textContent = score;
-        if (score > bestScore) {
-          bestScore = score;
-          bestScoreEl.textContent = bestScore;
-        }
-        logActivity("All tests passed! Score +1.");
-      } else {
-        logActivity("Some tests failed. Keep tweaking.");
-      }
-    }
-
-    function nextChallenge() {
-      if (sessionEnded) return;
-      currentIndex = (currentIndex + 1) % challenges.length;
-      renderChallenge(currentIndex);
-    }
-
-    // --- Init ---------------------------------------------------------------
-    renderChallenge(currentIndex);
-    startClock();
-
-    runBtn.addEventListener("click", runTests);
-    nextBtn.addEventListener("click", nextChallenge);
-  </script>
 </body>
 </html>
